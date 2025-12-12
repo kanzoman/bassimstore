@@ -39,11 +39,20 @@ app.post('/order', async (req, res) => {
   try {
     const { name, phone, city, address, total, cart } = req.body;
 
-    if (!name || !phone || !city || !address || !cart?.length) {
+    if (!name || !phone || !city || !address || !Array.isArray(cart) || cart.length === 0) {
       return res.status(400).json({ success: false });
     }
 
     const orderId = 'BASSIM-' + Date.now();
+
+    // CLEAN CART – removes images, functions, undefined, circular refs
+    const cleanCart = cart.map(item => ({
+      id: item.id || null,
+      name: item.name || 'Unknown',
+      price: Number(item.price) || 0,
+      qty: Number(item.qty || 1),
+      img: item.img || null
+    }));
 
     await pool.query(
       `INSERT INTO orders (order_id, timestamp, name, phone, city, address, total, items)
@@ -51,18 +60,19 @@ app.post('/order', async (req, res) => {
       [
         orderId,
         new Date().toLocaleString('fr-MA'),
-        name,
-        phone,
+        name.trim(),
+        phone.trim(),
         city,
-        address,
-        total,
-        JSON.stringify(cart)   // ← fixed
+        address.trim(),
+        Number(total),
+        JSON.stringify(cleanCart)  // ← 100% valid JSON now
       ]
     );
 
     res.json({ success: true, orderId });
+
   } catch (err) {
-    console.error(err);
+    console.error('SAVE ERROR:', err.message);
     res.status(500).json({ success: false });
   }
 });

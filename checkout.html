@@ -71,6 +71,7 @@
   </div>
 
 <script>
+  const BACKEND_URL = 'https://courageous-trust-production-53f0.up.railway.app';
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
   const itemsContainer = document.getElementById('summary-items');
   let total = 0;
@@ -118,11 +119,12 @@
     btn.textContent = 'Processing...';
 
     try {
-      const response = await fetch('/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
+const response = await fetch(`${BACKEND_URL}/order`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(orderData)
+});
+
 
       const result = await response.json();
 

@@ -5,26 +5,25 @@ const path = require('path');
 const app = express();
 app.use(express.json());
 
-// CORS – allows Netlify to talk to Railway
+// CORS – allows Netlify to call this server
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
 
-// Serve your frontend (public folder)
+// Serve your public folder (frontend)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Database – works on Railway AND local
+// Database
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres',
+  connectionString: process.env.DATABASE_URL,
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
-// Create table automatically
+// Create table
 pool.query(`
   CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
@@ -40,13 +39,12 @@ pool.query(`
   )
 `).catch(() => {});
 
-// POST /order – receive order from checkout
+// POST /order
 app.post('/order', async (req, res) => {
   try {
     const { name, phone, city, address, total, cart } = req.body;
-
-    if (!name || !phone || !cart || cart.length === 0) {
-      return res.status(400).json({ success: false, message: 'Missing data' });
+    if (!name || !phone || !cart?.length) {
+      return res.status(400).json({ success: false });
     }
 
     const orderId = 'BASSIM-' + Date.now();
@@ -54,42 +52,23 @@ app.post('/order', async (req, res) => {
     await pool.query(
       `INSERT INTO orders (order_id, timestamp, name, phone, city, address, total, items)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [
-        orderId,
-        new Date().toLocaleString('fr-MA'),
-        name,
-        phone,
-        city,
-        address,
-        total,
-        cart
-      ]
+      [orderId, new Date().toLocaleString('fr-MA'), name, phone, city, address, total, cart]
     );
 
     res.json({ success: true, orderId });
-
   } catch (err) {
-    console.error('Error saving order:', err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 });
 
-// GET /orders – see all orders
+// GET /orders
 app.get('/orders', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json([]);
-  }
+  const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+  res.json(result.rows);
 });
 
-// Health check
-app.get('/', (req, res) => {
-  res.send('BASSIM backend is alive');
-});
+app.get('/', (req, res) => res.send('BASSIM backend alive'));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server on ${PORT}`));

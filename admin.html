@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><title>Bassim Orders</title><style>table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:8px}tr:nth-child(even){background:#f2f2f2}</style></head>
+<body style="font-family:Arial">
+<h1>BASSIM ORDERS</h1>
+<div id="orders"></div>
+<script>
+fetch('/orders')
+.then(r => r.json())
+.then(orders => {
+  let html = '<table><tr><th>ID</th><th>Date</th><th>Name</th><th>Phone</th><th>Total</th><th>Items</th></tr>';
+  orders.forEach(o => {
+    html += `<tr>
+      <td>${o.order_id}</td>
+      <td>${o.timestamp}</td>
+      <td>${o.name}</td>
+      <td>${o.phone}</td>
+      <td>${o.total} MAD</td>
+      <td>${o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>')}</td>
+    </tr>`;
+  });
+  document.getElementById('orders').innerHTML = html + '</table>';
+});
+</script>
+</body></html>

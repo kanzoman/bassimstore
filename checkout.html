@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bassim Store — Checkout</title>
+  <link rel="icon" href="https://i.ibb.co/Txx2CVhR/image-2025-12-09-220051433.png" type="image/png">
+<link rel="apple-touch-icon" href="https://i.ibb.co/Txx2CVhR/image-2025-12-09-220051433.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="checkout>
+
+  <div class="checkout-container">
+    <div class="checkout-header">
+      <div class="logo">BASSIM</div>
+      <a href="index.html" class="back">← Continue Shopping</a>
+    </div>
+
+    <div class="checkout-grid">
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h2>Order Summary</h2>
+        <div id="summary-items"></div>
+        <div class="summary-total">
+          <span>Total</span>
+          <strong id="summary-grand-total">0 MAD</strong>
+        </div>
+      </div>
+
+      <!-- Checkout Form -->
+      <div class="checkout-form">
+        <h2>Shipping Information</h2>
+        <form id="checkout-form">
+          <input type="text" id="name" placeholder="Full Name" required>
+          <input type="tel" id="phone" placeholder="+212 6XX XXX XXX" required>
+          <select id="city" required>
+            <option value="" disabled selected>City</option>
+            <option>Casablanca</option>
+            <option>Rabat</option>
+            <option>Marrakech</option>
+            <option>Fes</option>
+            <option>Tangier</option>
+            <option>Agadir</option>
+            <option>Other</option>
+          </select>
+          <input type="text" id="address" placeholder="Full Address" required>
+
+          <button type="submit" class="place-order-btn" id="complete-order">
+            Complete Order — Pay on Delivery
+          </button>
+
+          <!-- Green Button Appears After Success -->
+          <a href="#" id="whatsapp-btn" class="whatsapp-btn" style="display:none;">
+            <i class="fab fa-whatsapp"></i> Finish Your Order on WhatsApp
+          </a>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="success-modal" class="modal">
+    <div class="modal-content success-modal">
+      <span class="close">×</span>
+      <i class="fas fa-check-circle success-icon"></i>
+      <h2>Order Received!</h2>
+      <div id="customer-info"></div>
+      <button id="export-btn">Export Infos</button>
+    </div>
+  </div>
+
+<script>
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const itemsContainer = document.getElementById('summary-items');
+  let total = 0;
+
+  if (cart.length === 0) {
+    itemsContainer.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">Your cart is empty</p>';
+  } else {
+    cart.forEach(item => {
+      const itemTotal = item.price * (item.qty || 1);
+      total += itemTotal;
+      itemsContainer.innerHTML += `
+        <div class="summary-item">
+          <img src="${item.img}" alt="${item.name}">
+          <div>
+            <strong>${item.name}</strong>
+            <small>${item.qty || 1} × ${item.price} MAD</small>
+          </div>
+          <span>${itemTotal} MAD</span>
+        </div>`;
+    });
+  }
+  document.getElementById('summary-grand-total').textContent = total + ' MAD';
+
+  // FORM SUBMIT → SEND TO BACKEND
+  document.getElementById('checkout-form').onsubmit = async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const city = document.getElementById('city').value;
+    const address = document.getElementById('address').value.trim();
+
+    const orderData = {
+      name,
+      phone,
+      city,
+      address,
+      total,
+      cart
+    };
+
+    // Disable button
+    const btn = document.getElementById('complete-order');
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    try {
+      const response = await fetch('/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Show success modal
+        document.getElementById('customer-info').innerHTML = `
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Phone:</strong> ${phone}</p>
+          <p><strong>City:</strong> ${city}</p>
+          <p><strong>Address:</strong> ${address}</p>
+          <p><strong>Total:</strong> ${total} MAD</p>
+          <p><strong>Order ID:</strong> #${result.orderId}</p>
+          <hr>
+          <p><strong>Items:</strong></p>
+          ${cart.map(item => `• ${item.name} (${item.qty || 1}×)`).join('<br>')}
+          <p style="margin-top:1.5rem; color:#d4af37; font-weight:bold;">
+            Order confirmed! We will contact you soon.
+          </p>
+        `;
+
+        document.getElementById('success-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Clear cart after success
+        localStorage.removeItem('cart');
+      } else {
+        alert('Error: ' + result.message);
+        btn.disabled = false;
+        btn.textContent = 'Complete Order — Pay on Delivery';
+      }
+    } catch (err) {
+      alert('Connection error. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Complete Order — Pay on Delivery';
+    }
+  };
+
+  // Close modal
+  document.querySelector('.close').onclick = () => {
+    document.getElementById('success-modal').classList.remove('active');
+    document.body.style.overflow = '';
+    window.location.href = 'index.html'; // Optional: go home
+  };
+
+  // Remove WhatsApp button (optional)
+  document.getElementById('whatsapp-btn').style.display = 'none';
+</script>
+
+  <style>
+    .checkout-body { background:#000814; color:white; min-height:100vh; padding:3rem 0; }
+    .checkout-container { max-width:1200px; margin:0 auto; background:#0a0f1f; border-radius:24px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.8); }
+    .checkout-header { padding:2rem; background:#001f3f; display:flex; justify-content:space-between; align-items:center; }
+    .logo { font-size:2.5rem; font-weight:900; background:linear-gradient(45deg,#d4af37,white); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .back { color:#aaa; text-decoration:none; }
+
+    .checkout-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:0; }
+    .order-summary, .checkout-form { padding:3rem; }
+    .order-summary { background:#0d1429; border-right:1px solid #223; }
+    h2 { font-size:2rem; margin-bottom:2rem; background:linear-gradient(45deg,#d4af37,white); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+    .summary-item { display:flex; gap:1.5rem; padding:1.2rem 0; border-bottom:1px solid #334; align-items:center; }
+    .summary-item img { width:80px; border-radius:12px; }
+    .summary-total { margin-top:2rem; padding-top:1.5rem; border-top:2px solid #d4af37; font-size:1.6rem; display:flex; justify-content:space-between; }
+
+    .checkout-form input, .checkout-form select {
+      width:100%; padding:1.3rem; margin:1rem 0; background:#112; border:1px solid #334; border-radius:16px; color:white; font-size:1.1rem;
+    }
+    .place-order-btn {
+      width:100%; padding:1.5rem; background:#d4af37; color:black; border:none; border-radius:16px; font-size:1.4rem; font-weight:900; cursor:pointer; margin-top:2rem;
+    }
+    .whatsapp-btn {
+      display:block; width:100%; padding:1.5rem; background:#25D366; color:white; text-align:center; border-radius:16px; font-size:1.4rem; font-weight:900; margin-top:1.5rem; text-decoration:none;
+    }
+
+    /* Success Modal */
+    .modal {
+      position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999; display:grid; place-items:center;
+      opacity:0; visibility:hidden; transition:0.5s; backdrop-filter:blur(10px);
+    }
+    .modal.active { opacity:1; visibility:visible; }
+    .success-modal {
+      background:#0a0f1f; border:3px solid #d4af37; border-radius:24px; padding:3rem; text-align:center; max-width:500px; width:90%;
+      box-shadow:0 40px 100px rgba(212,175,55,0.4);
+    }
+    .success-icon { font-size:5rem; color:#d4af37; margin-bottom:1.5rem; }
+    #customer-info { background:#112; padding:2rem; border-radius:16px; margin:2rem 0; text-align:left; line-height:2; }
+    #export-btn {
+      background:#d4af37; color:black; padding:1.2rem 3rem; border:none; border-radius:50px; font-weight:900; cursor:pointer; margin-top:1.5rem;
+    }
+
+    @media (max-width:768px) {
+      .checkout-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</body>
+</html>

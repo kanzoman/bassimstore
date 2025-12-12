@@ -1,74 +1,70 @@
 const express = require('express');
+const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
-const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, '../public'))); // Serve your frontend
+// Serve frontend (Netlify already does this, but backup)
+app.use(express.static(path.join(__dirname, '../public')));
 
-// Ensure orders.json exists
-const ordersFile = path.join(__dirname, 'orders.json');
-if (!fs.existsSync(ordersFile)) {
-  fs.writeFileSync(ordersFile, JSON.stringify([], null, 2));
-}
+// Connect to Railway PostgreSQL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
-// POST /order — Receive order from checkout
-app.post('/order', (req, res) => {
+// Create table on startup
+pool.query(`
+  CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    order_id TEXT UNIQUE,
+    timestamp TEXT,
+    name TEXT,
+    phone TEXT,
+    city TEXT,
+    address TEXT,
+    total INTEGER,
+    items JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+  )
+`);
+
+// POST /order – receive order from checkout
+app.post('/order', async (req, res) => {
   try {
-    const order = req.body;
+    const { name, phone, city, address, total, cart } = req.body;
 
-    // Basic validation
-    if (!order.name || !order.phone || !order.city || !order.address || !order.cart || order.cart.length === 0) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    if (!name || !phone || !cart || cart.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid data' });
     }
 
-    // Add timestamp and order ID
-    const newOrder = {
-      id: Date.now().toString(),
-      timestamp: new Date().toLocaleString('en-GB', { timeZone: 'Africa/Casablanca' }),
-      ...order
-    };
+    const orderId = 'BASSIM-' + Date.now();
+    const timestamp = new Date().toLocaleString('fr-MA');
 
-    // Read existing orders
-    const rawData = fs.readFileSync(ordersFile);
-    const orders = JSON.parse(rawData);
+    await pool.query(
+      `INSERT INTO orders (order_id, timestamp, name, phone, city, address, total, items)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [orderId, timestamp, name, phone, city, address, total, cart]
+    );
 
-    // Append new order
-    orders.push(newOrder);
-
-    // Save back to file
-    fs.writeFileSync(ordersFile, JSON.stringify(orders, null, 2));
-
-    console.log(`New order received from ${order.name} - ${order.phone}`);
-
-    res.json({
-      success: true,
-      message: 'Order confirmed successfully!',
-      orderId: newOrder.id
-    });
-
-  } catch (error) {
-    console.error('Error saving order:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.json({ success: true, orderId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 });
 
-// Optional: View all orders (for admin only - remove in production if needed)
-app.get('/admin-orders', (req, res) => {
-  res.sendFile(path.join(__dirname, 'orders.json'));
+// GET /orders – view all orders (you open this link)
+app.get('/orders', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).send('Error');
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Checkout will send orders to http://localhost:${PORT}/order`);
-});
-
-app.get("/orders", (req, res) => {
-  const orders = JSON.parse(fs.readFileSync("orders.json"));
-  res.json(orders);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

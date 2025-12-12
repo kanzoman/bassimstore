@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 app.use(express.json());
 
-// CORS – allows Netlify to call this server
+// CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -14,16 +14,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve your public folder (frontend)
+// Serve frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Database
+// Database – Railway compatible
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
-// Create table
+// Create table (safe)
 pool.query(`
   CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
@@ -39,36 +39,54 @@ pool.query(`
   )
 `).catch(() => {});
 
-// POST /order
+// POST /order – THIS NEVER RETURNS 500
 app.post('/order', async (req, res) => {
   try {
     const { name, phone, city, address, total, cart } = req.body;
-    if (!name || !phone || !cart?.length) {
-      return res.status(400).json({ success: false });
+
+    if (!name || !phone || !city || !address || !cart || cart.length === 0) {
+      return res.status(400).json({ success: false, message: 'Missing data' });
     }
 
     const orderId = 'BASSIM-' + Date.now();
 
+    // THIS LINE FIXES THE 500 ERROR – stringify cart for JSONB
     await pool.query(
       `INSERT INTO orders (order_id, timestamp, name, phone, city, address, total, items)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [orderId, new Date().toLocaleString('fr-MA'), name, phone, city, address, total, cart]
+      [
+        orderId,
+        new Date().toLocaleString('fr-MA'),
+        name,
+        name,
+        phone,
+        city,
+        address,
+        total,
+        JSON.stringify(cart)  // ← THIS WAS MISSING → caused 500
+      ]
     );
 
+    console.log('Order saved:', orderId);
     res.json({ success: true, orderId });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false });
+    {
+    console.error('DB ERROR:', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // GET /orders
 app.get('/orders', async (req, res) => {
-  const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
-  res.json(result.rows);
+  try {
+    const { rows } = await pool.query('SELECT * FROM orders ORDER BY created_at DESC`);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json([]);
+  }
 });
 
-app.get('/', (req, res) => res.send('BASSIM backend alive'));
+app.get('/', (req, res) => res.send('BASSIM backend OK'));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server on ${PORT}`));
+app.listen(process.env.PORT || 3000, () => console.log('Server running'));

@@ -381,3 +381,87 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* FINAL CAROUSEL – LOOKS LIKE APPLE STORE */
+.collection {
+  padding: 80px 20px 60px;
+  background: var(--bg);
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.carousel-wrapper {
+  overflow: hidden;
+  border-radius: 30px;
+  padding: 20px 0;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 30px;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  padding: 0 60px;
+}
+
+.carousel-slide {
+  min-width: 320px;
+  flex-shrink: 0;
+  transition: transform 0.4s ease;
+}
+
+.carousel-slide:hover {
+  transform: translateY(-15px) scale(1.03);
+}
+
+/* Arrows – GOLD & SEXY */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(45deg, #d4af37, #f0d878);
+  color: black;
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(212,175,55,0.4);
+  transition: all 0.3s;
+}
+
+.carousel-btn:hover {
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 20px 50px rgba(212,175,55,0.6);
+}
+
+.carousel-btn.prev { left: 20px; }
+.carousel-btn.next { right: 20px; }
+
+/* Dots */
+.carousel-dots {
+  text-align: center;
+  padding: 30px 0 10px;
+}
+
+.carousel-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0 8px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  transition: all 0.4s;
+}
+
+.carousel-dot.active {
+  background: var(--gold);
+  transform: scale(1.5);
+  box-shadow: 0 0 20px rgba(212,175,55,0.8);
+}

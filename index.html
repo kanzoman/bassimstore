@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bassim Store — Premium Phone Cases</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Cool Gold Phone Favicon + Title -->
-<link rel="icon" href="https://i.ibb.co/Txx2CVhR/image-2025-12-09-220051433.png" type="image/png">
-<link rel="apple-touch-icon" href="https://i.ibb.co/Txx2CVhR/image-2025-12-09-220051433.png">
+  <link rel="icon" href="https://i.ibb.co/Txx2CVhR/image-2025-12-09-220051433.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 </head>
 <body>
 
@@ -22,7 +21,7 @@
   <!-- Overlay -->
   <div id="overlay" class="overlay"></div>
 
-  <!-- Floating Navbar -->
+  <!-- Navbar -->
   <nav class="floating-nav">
     <div class="logo-glow">BASSIM PHONES</div>
     <div class="nav-icons">
@@ -40,75 +39,88 @@
     <div class="hero-content">
       <h1 class="glitch" data-text="BASSIM">BASSIM</h1>
       <p class="tagline">Your Phone. Elevated.</p>
-<a href="#collection" class="hero-btn smooth-scroll">Shop Now</a>    </div>
-  </section>
-
-<!-- Collection -->
-  <section id="collection" class="collection">
-    <h2 class="section-title">In Stock Now</h2>
-    <div class="cards-container">
-
-      <!-- 1. Apple Silicone — WITH PENCIL -->
-      <div class="glass-card" data-id="apple-silicone">
-        <div class="card-image">
-          <img src="https://i.ibb.co/zhNMhsS7/a719a615-db00-4579-8eda-1f6f24efe52f.jpg" alt="Apple Silicone Cases">
-          <div class="card-glow"></div>
-        </div>
-        <h3>Apple Official Silicone Case</h3>
-        <p class="price">37 MAD</p>
-        <div class="card-actions">
-          <button class="add-cart">Add to Cart</button>
-          <button class="customize-btn" data-type="apple"><i class="fas fa-pencil-alt"></i></button>
-        </div>
-        <button class="wishlist"><i class="fas fa-heart"></i></button>
-      </div>
-
-      <!-- 2. Rhode Lip Case — WITH PENCIL -->
-      <div class="glass-card" data-id="rhode-lip">
-        <div class="card-image">
-          <img src="https://i.ibb.co/8ggf7swm/Whats-App-Image-2025-11-27-at-10-50-13.jpg" alt="Rhode Lip Case">
-          <div class="card-glow"></div>
-        </div>
-        <h3>Rhode Lip Case</h3>
-        <p class="price">70 MAD</p>
-        <div class="card-actions">
-          <button class="add-cart">Add to Cart</button>
-          <button class="customize-btn" data-type="rhode"><i class="fas fa-pencil-alt"></i></button>
-        </div>
-        <button class="wishlist"><i class="fas fa-heart"></i></button>
-      </div>
-
-      <!-- 3. Suction Grip — WITH PENCIL -->
-      <div class="glass-card" data-id="suction-grip">
-        <div class="card-image">
-          <img src="https://i.ibb.co/vvmgcQ5s/a3b0895b-1a49-42a5-b487-48c660948d33.jpg" alt="Suction Grip Cases">
-          <div class="card-glow"></div>
-        </div>
-        <h3>Suction Grip Case</h3>
-        <p class="price">27 MAD</p>
-        <div class="card-actions">
-          <button class="add-cart">Add to Cart</button>
-          <button class="customize-btn" data-type="suction"><i class="fas fa-pencil-alt"></i></button>
-        </div>
-        <button class="wishlist"><i class="fas fa-heart"></i></button>
-      </div>
-
-      <!-- 4. MagSafe Clear — NO PENCIL (invisible) -->
-      <div class="glass-card" data-id="magsafe-clear">
-        <div class="card-image">
-          <img src="https://i.ibb.co/GQhG6fNQ/65edf067-9381-427c-850e-b33f02492659.jpg" alt="MagSafe Clear Case">
-          <div class="card-glow"></div>
-        </div>
-        <h3>Official MagSafe Clear Case</h3>
-        <p class="price">33 MAD</p>
-        <button class="add-cart">Add to Cart</button>
-        <button class="wishlist"><i class="fas fa-heart"></i></button>
-      </div>
-
+      <a href="#collection" class="hero-btn smooth-scroll">Shop Now</a>
     </div>
   </section>
 
-  <!-- Cart Sidebar — FULLY WORKING -->
+  <!-- PRO CAROUSEL -->
+  <section id="collection" class="collection">
+    <h2 class="section-title">In Stock Now</h2>
+
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <div class="glass-card" data-id="apple-silicone">
+            <div class="card-image">
+              <img src="https://i.ibb.co/zhNMhsS7/a719a615-db00-4579-8eda-1f6f24efe52f.jpg" alt="Apple Silicone">
+              <div class="card-glow"></div>
+            </div>
+            <h3>Apple Official Silicone Case</h3>
+            <p class="price">37 MAD</p>
+            <div class="card-actions">
+              <button class="add-cart">Add to Cart</button>
+              <button class="customize-btn" data-type="apple"><i class="fas fa-pencil-alt"></i></button>
+            </div>
+            <button class="wishlist"><i class="fas fa-heart"></i></button>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="glass-card" data-id="rhode-lip">
+            <div class="card-image">
+              <img src="https://i.ibb.co/8ggf7swm/Whats-App-Image-2025-11-27-at-10-50-13.jpg" alt="Rhode">
+              <div class="card-glow"></div>
+            </div>
+            <h3>Rhode Lip Case</h3>
+            <p class="price">70 MAD</p>
+            <div class="card-actions">
+              <button class="add-cart">Add to Cart</button>
+              <button class="customize-btn" data-type="rhode"><i class="fas fa-pencil-alt"></i></button>
+            </div>
+            <button class="wishlist"><i class="fas fa-heart"></i></button>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="glass-card" data-id="suction-grip">
+            <div class="card-image">
+              <img src="https://i.ibb.co/vvmgcQ5s/a3b0895b-1a49-42a5-b487-48c660948d33.jpg" alt="Suction">
+              <div class="card-glow"></div>
+            </div>
+            <h3>Suction Grip Case</h3>
+            <p class="price">27 MAD</p>
+            <div class="card-actions">
+              <button class="add-cart">Add to Cart</button>
+              <button class="customize-btn" data-type="suction"><i class="fas fa-pencil-alt"></i></button>
+            </div>
+            <button class="wishlist"><i class="fas fa-heart"></i></button>
+          </div>
+        </div>
+
+        <div class="swiper-slide">
+          <div class="glass-card" data-id="magsafe-clear">
+            <div class="card-image">
+              <img src="https://i.ibb.co/GQhG6fNQ/65edf067-9381-427c-850e-b33f02492659.jpg" alt="MagSafe">
+              <div class="card-glow"></div>
+            </div>
+            <h3>Official MagSafe Clear Case</h3>
+            <p class="price">33 MAD</p>
+            <div class="card-actions">
+              <button class="add-cart">Add to Cart</button>
+            </div>
+            <button class="wishlist"><i class="fas fa-heart"></i></button>
+          </div>
+        </div>
+
+      </div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+
+  <!-- Cart Sidebar -->
   <aside id="cart-sidebar" class="sidebar">
     <div class="sidebar-header">
       <h3>Your Cart</h3>
@@ -131,28 +143,26 @@
     <div id="wishlist-items" class="cart-items-container"></div>
   </aside>
 
-<!-- CUSTOMIZER MODAL — FINAL LUXURY VERSION -->
-<div id="customizer" class="modal">
-  <div class="modal-content">
-    <span class="close">×</span>
-    <h3>Customize Your Case</h3>
-    <div id="customizer-options"></div>
-
-    <label>Phone Model</label>
-    <select id="custom-model">
-      <option>iPhone 15 Pro Max</option>
-      <option>iPhone 15 Pro</option>
-      <option>iPhone 15</option>
-      <option>iPhone 14 Pro Max</option>
-      <option>iPhone 14 Pro</option>
-    </select>
-
-<!-- BIG ASS CONFIRM BUTTON -->
-    <button id="custom-add-cart" class="big-confirm-btn">
-      <i class="fas fa-check"></i> CONFIRM & ADD TO CART
-    </button>
+  <!-- Customizer Modal — X BUTTON NOW WORKS -->
+  <div id="customizer" class="modal">
+    <div class="modal-content">
+      <span class="close">×</span>
+      <h3>Customize Your Case</h3>
+      <div id="customizer-options"></div>
+      <label>Phone Model</label>
+      <select id="custom-model">
+        <option>iPhone 15 Pro Max</option>
+        <option>iPhone 15 Pro</option>
+        <option>iPhone 15</option>
+        <option>iPhone 14 Pro Max</option>
+        <option>iPhone 14 Pro</option>
+      </select>
+      <button id="custom-add-cart" class="big-confirm-btn">
+        <i class="fas fa-check"></i> CONFIRM & ADD TO CART
+      </button>
+    </div>
   </div>
-</div>
+
   <!-- Quick View Modal -->
   <div id="quickview" class="modal">
     <div class="modal-content">
@@ -173,6 +183,44 @@
       </div>
     </div>
   </div>
+
+  <!-- SWIPER + ALL MODAL X BUTTONS WORK -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    // Swiper Carousel
+    const swiper = new Swiper('.mySwiper', {
+      loop: true,
+      centeredSlides: true,
+      grabCursor: true,
+      slidesPerView: 1.15,
+      spaceBetween: 20,
+      pagination: { el: '.swiper-pagination', clickable: true },
+      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+      breakpoints: {
+        640: { slidesPerView: 2 },
+        768: { slidesPerView: 3 },
+        1024: { slidesPerView: 4 }
+      }
+    });
+
+    // Close all modals with X
+    document.querySelectorAll('.modal .close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.modal').classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Close modal when clicking outside
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', e => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+  </script>
 
   <script src="script.js"></script>
 </body>

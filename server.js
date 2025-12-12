@@ -67,3 +67,8 @@ app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Checkout will send orders to http://localhost:${PORT}/order`);
 });
+
+app.get("/orders", (req, res) => {
+  const orders = JSON.parse(fs.readFileSync("orders.json"));
+  res.json(orders);
+});

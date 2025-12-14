@@ -1,39 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Bassim Orders</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BASSIM ORDERS — HYPER MODE</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body { padding: 40px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 15px; border: 1px solid var(--gold); }
-    th { background: var(--navy); }
+    body { background: linear-gradient(135deg, #000814, #001f3f); padding: 40px 20px; min-height: 100vh; }
+    h1 { 
+      text-align: center; font-size: 5rem; font-weight: 900; 
+      background: linear-gradient(45deg, #d4af37, #f0d878, #d4af37); 
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 60px rgba(212,175,55,0.8); animation: glow 2s infinite alternate;
+    }
+    @keyframes glow { from { filter: drop-shadow(0 0 20px #d4af37); } to { filter: drop-shadow(0 0 60px #f0d878); } }
+
+    .container { max-width: 1400px; margin: 0 auto; }
+    table { 
+      width: 100%; border-collapse: separate; border-spacing: 0 15px; 
+      background: transparent;
+    }
+    thead th { 
+      background: linear-gradient(to right, #001122, #001f3f); 
+      padding: 25px; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 3px;
+      border-bottom: 3px solid #d4af37; box-shadow: 0 10px 30px rgba(212,175,55,0.3);
+    }
+    tbody tr { 
+      background: rgba(10,20,40,0.8); backdrop-filter: blur(15px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6); transition: all 0.4s;
+      border-radius: 20px; overflow: hidden;
+    }
+    tbody tr:hover { 
+      transform: translateY(-10px) scale(1.02); 
+      box-shadow: 0 40px 80px rgba(212,175,55,0.6); 
+      background: rgba(20,40,80,0.9);
+    }
+    td { padding: 25px; font-size: 1.2rem; border-bottom: 1px solid rgba(212,175,55,0.2); }
+    .total { font-weight: 900; font-size: 1.5rem; color: #f0d878; text-shadow: 0 0 20px #d4af37; }
+    .items { line-height: 2; }
+
+    @media (max-width:768px) {
+      h1 { font-size: 3rem; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tbody tr { margin-bottom: 30px; border-radius: 20px; }
+      td { padding: 15px 20px; position: relative; padding-left: 50%; text-align: right; }
+      td:before { 
+        content: attr(data-label); position: absolute; left: 20px; width: 45%; 
+        font-weight: bold; color: #d4af37; text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>BASSIM ORDERS</h1>
-  <table id="orders"></table>
+  <div class="container">
+    <h1>BASSIM ORDERS</h1>
+    <div id="orders-table"></div>
+  </div>
 
   <script>
-    const BACKEND_URL = 'https://courageous-trust-production-53f0.up.railway.app';
-
-    fetch(`${BACKEND_URL}/orders`)
+    fetch('/orders')
       .then(r => r.json())
       .then(orders => {
-        let html = `<tr><th>ID</th><th>Date</th><th>Name</th><th>Phone</th><th>City</th><th>Total</th><th>Items</th></tr>`;
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>City</th>
+                <th>Total</th>
+                <th>Items</th>
+              </tr>
+            </thead>
+            <tbody>`;
         orders.forEach(o => {
           const items = o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>');
-          html += `<tr>
-            <td>${o.order_id}</td>
-            <td>${o.timestamp}</td>
-            <td>${o.name}</td>
-            <td>${o.phone}</td>
-            <td>${o.city}</td>
-            <td>${o.total} MAD</td>
-            <td>${items}</td>
-          </tr>`;
+          html += `
+            <tr>
+              <td data-label="ID">${o.order_id}</td>
+              <td data-label="Date">${o.timestamp}</td>
+              <td data-label="Name">${o.name}</td>
+              <td data-label="Phone">${o.phone}</td>
+              <td data-label="City">${o.city}</td>
+              <td data-label="Total" class="total">${o.total} MAD</td>
+              <td data-label="Items" class="items">${items}</td>
+            </tr>`;
         });
-        document.getElementById('orders').innerHTML = html;
+        html += `</tbody></table>`;
+        document.getElementById('orders-table').innerHTML = orders.length ? html : '<h2 style="text-align:center;color:#666;margin-top:100px;">No orders yet — waiting for the first one 🔥</h2>';
       });
   </script>
 </body>

@@ -59,40 +59,45 @@
     <div id="orders-table"></div>
   </div>
 
-  <script>
-    fetch('/orders')
-      .then(r => r.json())
-      .then(orders => {
-        let html = `
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>City</th>
-                <th>Total</th>
-                <th>Items</th>
-              </tr>
-            </thead>
-            <tbody>`;
-        orders.forEach(o => {
-          const items = o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>');
-          html += `
+<script>
+  const BACKEND_URL = 'https://courageous-trust-production-53f0.up.railway.app';
+
+  fetch(`${BACKEND_URL}/orders`)
+    .then(r => r.json())
+    .then(orders => {
+      let html = `
+        <table>
+          <thead>
             <tr>
-              <td data-label="ID">${o.order_id}</td>
-              <td data-label="Date">${o.timestamp}</td>
-              <td data-label="Name">${o.name}</td>
-              <td data-label="Phone">${o.phone}</td>
-              <td data-label="City">${o.city}</td>
-              <td data-label="Total" class="total">${o.total} MAD</td>
-              <td data-label="Items" class="items">${items}</td>
-            </tr>`;
-        });
-        html += `</tbody></table>`;
-        document.getElementById('orders-table').innerHTML = orders.length ? html : '<h2 style="text-align:center;color:#666;margin-top:100px;">No orders yet — waiting for the first one 🔥</h2>';
+              <th>ID</th>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>City</th>
+              <th>Total</th>
+              <th>Items</th>
+            </tr>
+          </thead>
+          <tbody>`;
+      orders.forEach(o => {
+        const items = o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>');
+        html += `
+          <tr>
+            <td>${o.order_id}</td>
+            <td>${o.timestamp}</td>
+            <td>${o.name}</td>
+            <td>${o.phone}</td>
+            <td>${o.city}</td>
+            <td>${o.total} MAD</td>
+            <td>${items}</td>
+          </tr>`;
       });
-  </script>
+      html += `</tbody></table>`;
+      document.getElementById('orders-table').innerHTML = html || '<p>No orders yet</p>';
+    })
+    .catch(() => {
+      document.getElementById('orders-table').innerHTML = '<p>Error loading orders</p>';
+    });
+</script>
 </body>
 </html>

@@ -17,10 +17,7 @@
     @keyframes glow { from { filter: drop-shadow(0 0 20px #d4af37); } to { filter: drop-shadow(0 0 60px #f0d878); } }
 
     .container { max-width: 1400px; margin: 0 auto; }
-    table { 
-      width: 100%; border-collapse: separate; border-spacing: 0 15px; 
-      background: transparent;
-    }
+    table { width: 100%; border-collapse: separate; border-spacing: 0 15px; background: transparent; }
     thead th { 
       background: linear-gradient(to right, #001122, #001f3f); 
       padding: 25px; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 3px;
@@ -44,12 +41,16 @@
       h1 { font-size: 3rem; }
       table, thead, tbody, th, td, tr { display: block; }
       thead { display: none; }
-      tbody tr { margin-bottom: 30px; border-radius: 20px; }
-      td { padding: 15px 20px; position: relative; padding-left: 50%; text-align: right; }
+      tbody tr { margin-bottom: 30px; border-radius: 20px; padding: 20px; }
+      td { 
+        display: block; text-align: right; padding: 15px 20px; 
+        position: relative; padding-left: 50%; font-size: 1.1rem;
+      }
       td:before { 
         content: attr(data-label); position: absolute; left: 20px; width: 45%; 
-        font-weight: bold; color: #d4af37; text-align: left;
+        font-weight: bold; color: #d4af37; text-align: left; text-transform: uppercase; letter-spacing: 1px;
       }
+      .total { font-size: 1.4rem; }
     }
   </style>
 </head>
@@ -59,45 +60,45 @@
     <div id="orders-table"></div>
   </div>
 
-<script>
-  const BACKEND_URL = 'https://courageous-trust-production-53f0.up.railway.app';
+  <script>
+    const BACKEND_URL = 'https://courageous-trust-production-53f0.up.railway.app';
 
-  fetch(`${BACKEND_URL}/orders`)
-    .then(r => r.json())
-    .then(orders => {
-      let html = `
-        <table>
-          <thead>
+    fetch(`${BACKEND_URL}/orders`)
+      .then(r => r.json())
+      .then(orders => {
+        let html = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>City</th>
+                <th>Total</th>
+                <th>Items</th>
+              </tr>
+            </thead>
+            <tbody>`;
+        orders.forEach(o => {
+          const items = o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>');
+          html += `
             <tr>
-              <th>ID</th>
-              <th>Date</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>City</th>
-              <th>Total</th>
-              <th>Items</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      orders.forEach(o => {
-        const items = o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>');
-        html += `
-          <tr>
-            <td>${o.order_id}</td>
-            <td>${o.timestamp}</td>
-            <td>${o.name}</td>
-            <td>${o.phone}</td>
-            <td>${o.city}</td>
-            <td>${o.total} MAD</td>
-            <td>${items}</td>
-          </tr>`;
+              <td data-label="ID">${o.order_id}</td>
+              <td data-label="Date">${o.timestamp}</td>
+              <td data-label="Name">${o.name}</td>
+              <td data-label="Phone">${o.phone}</td>
+              <td data-label="City">${o.city}</td>
+              <td data-label="Total" class="total">${o.total} MAD</td>
+              <td data-label="Items" class="items">${items}</td>
+            </tr>`;
+        });
+        html += `</tbody></table>`;
+        document.getElementById('orders-table').innerHTML = orders.length ? html : '<p style="text-align:center;color:#666;font-size:1.5rem;margin-top:100px;">No orders yet — waiting for the first one 🔥</p>';
+      })
+      .catch(() => {
+        document.getElementById('orders-table').innerHTML = '<p style="text-align:center;color:#d4af37;">Error loading orders</p>';
       });
-      html += `</tbody></table>`;
-      document.getElementById('orders-table').innerHTML = html || '<p>No orders yet</p>';
-    })
-    .catch(() => {
-      document.getElementById('orders-table').innerHTML = '<p>Error loading orders</p>';
-    });
-</script>
+  </script>
 </body>
 </html>

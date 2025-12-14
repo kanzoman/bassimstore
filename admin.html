@@ -1,68 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bassim Orders</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    body { background: var(--bg); color: var(--text); padding: 40px 20px; }
-    h1 { text-align: center; font-size: 3rem; margin-bottom: 40px; }
-    table { width: 100%; border-collapse: collapse; background: rgba(10,20,40,0.6); }
-    th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+    body { padding: 40px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px; border: 1px solid var(--gold); }
     th { background: var(--navy); }
-    tr:hover { background: rgba(212,175,55,0.1); }
-    @media (max-width:768px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      th { display: none; }
-      td { border: none; padding: 10px 0; position: relative; padding-left: 50%; }
-      td:before { content: attr(data-label); position: absolute; left: 10px; width: 45%; font-weight: bold; }
-    }
   </style>
 </head>
 <body>
   <h1>BASSIM ORDERS</h1>
-  <div id="orders-table"></div>
+  <table id="orders"></table>
 
   <script>
-    fetch('/orders')
+    const BACKEND_URL = 'https://courageous-trust-production-53f0.up.railway.app';
+
+    fetch(`${BACKEND_URL}/orders`)
       .then(r => r.json())
       .then(orders => {
-        let html = `
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>City</th>
-                <th>Total</th>
-                <th>Items</th>
-              </tr>
-            </thead>
-            <tbody>`;
-        
+        let html = `<tr><th>ID</th><th>Date</th><th>Name</th><th>Phone</th><th>City</th><th>Total</th><th>Items</th></tr>`;
         orders.forEach(o => {
-          const itemsList = o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>');
-          html += `
-            <tr>
-              <td data-label="ID">${o.order_id}</td>
-              <td data-label="Date">${o.timestamp}</td>
-              <td data-label="Name">${o.name}</td>
-              <td data-label="Phone">${o.phone}</td>
-              <td data-label="City">${o.city}</td>
-              <td data-label="Total">${o.total} MAD</td>
-              <td data-label="Items">${itemsList}</td>
-            </tr>`;
+          const items = o.items.map(i => `${i.name} (${i.qty || 1}×)`).join('<br>');
+          html += `<tr>
+            <td>${o.order_id}</td>
+            <td>${o.timestamp}</td>
+            <td>${o.name}</td>
+            <td>${o.phone}</td>
+            <td>${o.city}</td>
+            <td>${o.total} MAD</td>
+            <td>${items}</td>
+          </tr>`;
         });
-        
-        html += `</tbody></table>`;
-        document.getElementById('orders-table').innerHTML = html;
-      })
-      .catch(() => {
-        document.getElementById('orders-table').innerHTML = '<p style="text-align:center;">No orders yet</p>';
+        document.getElementById('orders').innerHTML = html;
       });
   </script>
 </body>
